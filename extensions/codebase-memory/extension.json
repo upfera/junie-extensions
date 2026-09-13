@@ -1,0 +1,4 @@
+{
+  "name": "codebase-memory",
+  "description": "Routes prompts mentioning indexed Codebase Memory projects to the local MCP context."
+}

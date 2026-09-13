@@ -1,0 +1,4 @@
+{
+  "name": "notifications",
+  "description": "Desktop notifications for Junie CLI lifecycle events, including WSL Windows Toast support."
+}

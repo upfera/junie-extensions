@@ -1,0 +1,59 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${JUNIE_EXTENSION_ROOT}/scripts/notify-send.sh\"",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${JUNIE_EXTENSION_ROOT}/scripts/notify-send.sh\"",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${JUNIE_EXTENSION_ROOT}/scripts/notify-send.sh\"",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${JUNIE_EXTENSION_ROOT}/scripts/notify-send.sh\"",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${JUNIE_EXTENSION_ROOT}/scripts/notify-send.sh\"",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}

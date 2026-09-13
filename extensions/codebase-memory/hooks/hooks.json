@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${JUNIE_EXTENSION_ROOT}/scripts/cbm-project-router.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
