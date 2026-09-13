@@ -1,0 +1,9 @@
+# Uncomment a hook and set it to true to enable notifications for it.
+# Supported hooks: SessionStart, UserPromptSubmit, PreToolUse, PermissionRequest, Stop, StopFailure, SessionEnd
+PermissionRequest=true
+Stop=true
+StopFailure=true
+#SessionStart=true
+#UserPromptSubmit=true
+#PreToolUse=true
+#SessionEnd=true
