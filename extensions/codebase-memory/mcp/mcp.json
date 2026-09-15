@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "codebase-memory-mcp": {
+      "command": "codebase-memory-mcp"
+    },
+    "codebase-memory-scout": {
+      "command": "codebase-memory-mcp",
+      "args": [
+        "--tool-profile=scout"
+      ]
+    },
+    "codebase-memory-analysis": {
+      "command": "codebase-memory-mcp",
+      "args": [
+        "--tool-profile=analysis"
+      ]
+    }
+  }
+}

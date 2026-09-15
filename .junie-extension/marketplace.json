@@ -1,9 +1,74 @@
 {
   "name": "junie-extensions",
-  "owner": { "name": "Upfera" },
-  "metadata": { "description": "Junie extensions for Codebase Memory and desktop notifications.", "version": "1.0.0", "homepage": "https://github.com/upfera/junie-extensions" },
+  "owner": {
+    "name": "Upfera"
+  },
+  "metadata": {
+    "description": "Junie extensions for WSL notifications, Codebase Memory, Azure, and Azure DevOps.",
+    "version": "1.0.0",
+    "homepage": "https://github.com/upfera/junie-extensions"
+  },
   "extensions": [
-    { "name": "codebase-memory", "source": "./extensions/codebase-memory", "description": "Routes prompts mentioning indexed Codebase Memory projects to the local MCP context.", "version": "1.0.0", "author": { "name": "Upfera" }, "category": "developer-tools", "keywords": ["codebase-memory", "mcp", "hooks"] },
-    { "name": "notifications", "source": "./extensions/notifications", "description": "Desktop notifications for Junie CLI lifecycle events, including WSL Windows Toast support.", "version": "1.0.0", "author": { "name": "Upfera" }, "category": "productivity", "keywords": ["notifications", "windows", "wsl", "hooks"] }
+    {
+      "name": "codebase-memory",
+      "source": "./extensions/codebase-memory",
+      "description": "Routes prompts mentioning indexed Codebase Memory projects to the local MCP context.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Upfera"
+      },
+      "category": "developer-tools",
+      "keywords": [
+        "codebase-memory",
+        "mcp",
+        "hooks"
+      ]
+    },
+    {
+      "name": "wsl-notifications",
+      "source": "./extensions/wsl-notifications",
+      "description": "Desktop notifications for Junie CLI lifecycle events, including WSL Windows Toast support.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Upfera"
+      },
+      "category": "productivity",
+      "keywords": [
+        "notifications",
+        "windows",
+        "wsl",
+        "hooks"
+      ]
+    },
+    {
+      "name": "azure",
+      "source": "./extensions/azure",
+      "description": "Azure MCP server configuration.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Upfera"
+      },
+      "category": "developer-tools",
+      "keywords": [
+        "azure",
+        "mcp"
+      ]
+    },
+    {
+      "name": "azure-devops",
+      "source": "./extensions/azure-devops",
+      "description": "Azure DevOps MCP server, agents, and workflow skills.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Upfera"
+      },
+      "category": "developer-tools",
+      "keywords": [
+        "azure-devops",
+        "mcp",
+        "boards",
+        "pipelines"
+      ]
+    }
   ]
 }
