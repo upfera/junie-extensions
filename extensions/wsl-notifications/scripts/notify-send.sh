@@ -137,11 +137,11 @@ build_powershell_command() {
 \$logo = ''
 
 if (\$logoSource -and (Test-Path -LiteralPath \$logoSource)) {
-    \$logoDirectory = Join-Path \$env:TEMP 'junie'
+    \$logoDirectory = \$env:USERPROFILE
 
     New-Item -ItemType Directory -Force -Path \$logoDirectory | Out-Null
 
-    \$logoDestination = Join-Path \$logoDirectory 'junie-logo.svg'
+    \$logoDestination = Join-Path \$logoDirectory '.junie/junie-logo.svg'
 
     Copy-Item -LiteralPath \$logoSource -Destination \$logoDestination -Force
 

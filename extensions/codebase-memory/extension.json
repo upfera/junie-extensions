@@ -1,4 +1,4 @@
 {
   "name": "codebase-memory",
-  "description": "Routes prompts mentioning indexed Codebase Memory projects to the local MCP context."
+  "description": "Codebase Memory MCP profiles, routing hook, agents, and skill."
 }
