@@ -1,6 +1,6 @@
 # Junie Extensions
 
-Marketplace containing five independent Junie CLI extensions.
+Marketplace containing four independent Junie CLI extensions.
 
 ## Extensions
 
