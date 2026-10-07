@@ -13,6 +13,7 @@ test -f "$hooks_file"
 grep --fixed-strings 'PermissionRequest=true' "$hooks_file"
 grep --fixed-strings 'Stop=true' "$hooks_file"
 grep --fixed-strings 'StopFailure=true' "$hooks_file"
+python3 -c 'import json,sys; events=json.load(open(sys.argv[1]))["hooks"]; assert set(events) == {"SessionStart", "UserPromptSubmit", "PreToolUse", "PermissionRequest", "Stop", "StopFailure", "SessionEnd"}' "$root/hooks/hooks.json"
 printf '%s\n' '{"hook_event_name":"Stop","last_assistant_message":"test event"}' | JUNIE_NOTIFY_COMMAND="$(command -v printf)" "$notify" >/dev/null
 disabled_output=$(printf '%s\n' '{"hook_event_name":"SessionEnd","last_assistant_message":"disabled"}' | JUNIE_NOTIFY_COMMAND="$(command -v printf)" "$notify")
 test -z "$disabled_output"
