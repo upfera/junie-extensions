@@ -11,7 +11,7 @@ export JUNIE_CBM_HOOK_DEBUG="${JUNIE_CBM_HOOK_DEBUG:-0}"
 export CBM_BIN="${CBM_BIN:-codebase-memory-mcp}"
 
 cbm_debug() {
-    if [ "${JUNIE_CBM_HOOK_DEBUG:-0}" = "1" ]; then
+    if [[ "${JUNIE_CBM_HOOK_DEBUG:-0}" = "1" ]]; then
         local msg="$1"
         local ts
         ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date +"%Y-%m-%d %H:%M:%S")
@@ -20,34 +20,38 @@ cbm_debug() {
             printf '[%s] %s\n' "$ts" "$msg" >> "$JUNIE_CBM_CACHE_DIR/hook-debug.log" 2>/dev/null || true
         fi
     fi
+    return 0
 }
 
 cbm_normalize() {
     # Lowercase and treat _ and - as equivalent (map _ to -)
-    printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | tr '_' '-'
+    local value="$1"
+    printf '%s' "$value" | tr '[:upper:]' '[:lower:]' | tr '_' '-'
+    return "$?"
 }
 
 cbm_get_file_mtime() {
     local file="$1"
     # Linux stat: stat -c %Y; BSD/macOS stat: stat -f %m
     stat -c %Y "$file" 2>/dev/null || stat -f %m "$file" 2>/dev/null || echo 0
+    return 0
 }
 
 cbm_is_cache_fresh() {
     local cache_file="${JUNIE_CBM_CACHE_FILE}"
-    [ -f "$cache_file" ] && [ -s "$cache_file" ] || return 1
+    [[ -f "$cache_file" ]] && [[ -s "$cache_file" ]] || return 1
 
     local mtime now age ttl
     mtime=$(cbm_get_file_mtime "$cache_file")
     now=$(date +%s 2>/dev/null || echo 0)
     ttl="${JUNIE_CBM_CACHE_TTL_SEC:-600}"
 
-    if [ "$mtime" -le 0 ] || [ "$now" -le 0 ]; then
+    if [[ "$mtime" -le 0 ]] || [[ "$now" -le 0 ]]; then
         return 1
     fi
 
     age=$(( now - mtime ))
-    if [ "$age" -lt "$ttl" ] && [ "$age" -ge 0 ]; then
+    if [[ "$age" -lt "$ttl" ]] && [[ "$age" -ge 0 ]]; then
         cbm_debug "Cache is fresh (age: ${age}s, ttl: ${ttl}s)"
         return 0
     else
@@ -92,9 +96,9 @@ cbm_fetch_projects() {
         raw_out=$($timeout_cmd "$bin" cli list_projects --offset "$offset" --limit "$limit" </dev/null 2>/dev/null)
         local status=$?
 
-        if [ $status -ne 0 ]; then
+        if [[ $status -ne 0 ]]; then
             cbm_debug "Command exited with status $status (offset: $offset)"
-            if [ ${#all_projects[@]} -eq 0 ]; then
+            if [[ ${#all_projects[@]} -eq 0 ]]; then
                 return 1
             fi
             break
@@ -102,36 +106,34 @@ cbm_fetch_projects() {
 
         local names
         names=$(printf '%s' "$raw_out" | jq -r '.projects[]? | if type == "object" then .name else . end' 2>/dev/null)
-        if [ -z "$names" ]; then
+        if [[ -z "$names" ]]; then
             cbm_debug "No projects extracted from CLI output at offset $offset"
             break
         fi
 
         while IFS= read -r name; do
-            [ -n "$name" ] && all_projects+=("$name")
+            [[ -n "$name" ]] && all_projects+=("$name")
         done <<< "$names"
 
         local has_more
         has_more=$(printf '%s' "$raw_out" | jq -r '.has_more // false' 2>/dev/null)
-        if [ "$has_more" != "true" ]; then
+        if [[ "$has_more" != "true" ]]; then
             break
         fi
 
         # Check total time spent
         local cur_time
         cur_time=$(date +%s 2>/dev/null || echo 0)
-        if [ "$start_time" -gt 0 ] && [ "$cur_time" -gt 0 ]; then
-            if [ $(( cur_time - start_time )) -ge "$max_total_time" ]; then
-                cbm_debug "Reached max total fetch time budget (${max_total_time}s)"
-                break
-            fi
+        if [[ "$start_time" -gt 0 && "$cur_time" -gt 0 && $(( cur_time - start_time )) -ge "$max_total_time" ]]; then
+            cbm_debug "Reached max total fetch time budget (${max_total_time}s)"
+            break
         fi
 
         offset=$(( offset + limit ))
     done
 
     local count="${#all_projects[@]}"
-    if [ "$count" -eq 0 ]; then
+    if [[ "$count" -eq 0 ]]; then
         cbm_debug "No projects found"
         return 1
     fi
@@ -171,7 +173,7 @@ cbm_ensure_cache() {
     fi
 
     # Stale cache fallback: if previous cache exists and is non-empty, use it
-    if [ -f "$JUNIE_CBM_CACHE_FILE" ] && [ -s "$JUNIE_CBM_CACHE_FILE" ]; then
+    if [[ -f "$JUNIE_CBM_CACHE_FILE" ]] && [[ -s "$JUNIE_CBM_CACHE_FILE" ]]; then
         cbm_debug "Using stale cache as fallback: $JUNIE_CBM_CACHE_FILE"
         return 0
     fi
@@ -183,21 +185,21 @@ cbm_ensure_cache() {
 # Populates associative array CBM_PROJECT_MAP (normalized_name -> canonical_name)
 cbm_load_project_map() {
     local cache_file="$JUNIE_CBM_CACHE_FILE"
-    if [ ! -f "$cache_file" ] || [ ! -s "$cache_file" ]; then
+    if [[ ! -f "$cache_file" ]] || [[ ! -s "$cache_file" ]]; then
         return 1
     fi
 
     local names
     names=$(jq -r '.projects[]? | if type == "object" then .name else . end' "$cache_file" 2>/dev/null)
-    if [ -z "$names" ]; then
+    if [[ -z "$names" ]]; then
         return 1
     fi
 
     while IFS= read -r orig; do
-        [ -z "$orig" ] && continue
+        [[ -z "$orig" ]] && continue
         local norm
         norm=$(cbm_normalize "$orig")
-        [ -n "$norm" ] && CBM_PROJECT_MAP["$norm"]="$orig"
+        [[ -n "$norm" ]] && CBM_PROJECT_MAP["$norm"]="$orig"
     done <<< "$names"
 
     return 0
@@ -207,7 +209,7 @@ cbm_load_project_map() {
 # Outputs comma-space separated string of matched canonical project names
 cbm_match_prompt() {
     local prompt="$1"
-    [ -z "$prompt" ] && return 0
+    [[ -z "$prompt" ]] && return 0
 
     local matched=()
     declare -A seen
@@ -217,7 +219,7 @@ cbm_match_prompt() {
     # Tokenize prompt into maximal runs of [A-Za-z0-9_-]+.
     # Punctuation (?, ,, ., `, (), etc.) adjacent to names is naturally stripped.
     while IFS= read -r token; do
-        [ -z "$token" ] && continue
+        [[ -z "$token" ]] && continue
         token_count=$((token_count + 1))
         local norm
         norm=$(cbm_normalize "$token")
@@ -235,7 +237,7 @@ cbm_match_prompt() {
 
     cbm_debug "Matcher examined $token_count prompt tokens and found ${#matched[@]} unique project(s)"
 
-    if [ ${#matched[@]} -gt 0 ]; then
+    if [[ ${#matched[@]} -gt 0 ]]; then
         local joined
         joined=$(printf ', %s' "${matched[@]}")
         printf '%s' "${joined:2}"
@@ -244,7 +246,7 @@ cbm_match_prompt() {
 
 cbm_build_additional_context_json() {
     local matched_str="$1"
-    [ -z "$matched_str" ] && return 0
+    [[ -z "$matched_str" ]] && return 0
 
     local context_msg="Codebase Memory has already confirmed these indexed project(s) mentioned in the prompt: ${matched_str}. Do not call list_projects or re-check the project list. Use the confirmed project name(s) directly with the Codebase Memory MCP tools to answer the user's request; verify relationships with search_graph, trace_path, or query_graph when needed, and do not infer relationships from name co-occurrence alone."
 
