@@ -11,6 +11,28 @@
         ]
       }
     ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${JUNIE_EXTENSION_ROOT}/scripts/notify-send.sh\"",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${JUNIE_EXTENSION_ROOT}/scripts/notify-send.sh\"",
+            "async": true
+          }
+        ]
+      }
+    ],
     "PermissionRequest": [
       {
         "hooks": [
