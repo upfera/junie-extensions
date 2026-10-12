@@ -6,16 +6,16 @@ trap 'rm -rf "$tmp"' EXIT
 export HOME="$tmp/home"
 mkdir -p "$HOME/.junie"
 notify="$root/scripts/notify-send.sh"
-test ! -e "$root/scripts/config.py"
-test -f "$root/resources/junie-logo.svg"
+[[ ! -e "$root/scripts/config.py" ]]
+[[ -f "$root/resources/junie-logo.svg" ]]
 hooks_file="$root/.hooks-enabled"
-test -f "$hooks_file"
+[[ -f "$hooks_file" ]]
 grep --fixed-strings 'PermissionRequest=true' "$hooks_file"
 grep --fixed-strings 'Stop=true' "$hooks_file"
 grep --fixed-strings 'StopFailure=true' "$hooks_file"
 printf '%s\n' '{"hook_event_name":"Stop","last_assistant_message":"test event"}' | JUNIE_NOTIFY_COMMAND="$(command -v printf)" "$notify" >/dev/null
 disabled_output=$(printf '%s\n' '{"hook_event_name":"SessionEnd","last_assistant_message":"disabled"}' | JUNIE_NOTIFY_COMMAND="$(command -v printf)" "$notify")
-test -z "$disabled_output"
+[[ -z "$disabled_output" ]]
 JUNIE_NOTIFY_COMMAND="$(command -v printf)" "$notify" test '{"hook_event_name":"SessionEnd","last_assistant_message":"Test przez WSL — żółć ąćęłńóśźż"}' >/dev/null
 JUNIE_NOTIFY_COMMAND="$(command -v printf)" "$notify" - test '{"hook_event_name":"Stop","last_assistant_message":"dash test"}' >/dev/null
 printf '%s\n' '{"hook_event_name":"Stop","last_assistant_message":"stdin test"}' | JUNIE_NOTIFY_COMMAND="$(command -v printf)" "$notify" - >/dev/null

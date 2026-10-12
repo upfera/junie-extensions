@@ -10,10 +10,10 @@ fi
 
 # Locate and source cbm-common.sh
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)"
-if [ -f "$SCRIPT_DIR/cbm-common.sh" ]; then
+if [[ -f "$SCRIPT_DIR/cbm-common.sh" ]]; then
     # shellcheck source=scripts/cbm-common.sh
     source "$SCRIPT_DIR/cbm-common.sh"
-elif [ -f "$HOME/.junie/hooks/cbm-common.sh" ]; then
+elif [[ -f "$HOME/.junie/hooks/cbm-common.sh" ]]; then
     # shellcheck source=/dev/null
     source "$HOME/.junie/hooks/cbm-common.sh"
 else
@@ -29,7 +29,7 @@ main() {
     # Read entire payload from stdin
     local input
     input=$(cat 2>/dev/null)
-    if [ -z "$input" ]; then
+    if [[ -z "$input" ]]; then
         cbm_debug "No input received; exiting"
         exit 0
     fi
@@ -38,7 +38,7 @@ main() {
     # Extract user prompt
     local prompt
     prompt=$(printf '%s' "$input" | jq -r '.prompt // empty' 2>/dev/null)
-    if [ -z "$prompt" ]; then
+    if [[ -z "$prompt" ]]; then
         cbm_debug "Input contains no non-empty prompt; exiting"
         exit 0
     fi
@@ -60,7 +60,7 @@ main() {
     # Match tokens from prompt against known projects
     local matched
     matched=$(cbm_match_prompt "$prompt")
-    if [ -z "$matched" ]; then
+    if [[ -z "$matched" ]]; then
         cbm_debug "No project names matched prompt; exiting"
         exit 0
     fi
