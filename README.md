@@ -4,14 +4,26 @@ Marketplace containing four independent Junie CLI extensions.
 
 ## Extensions
 
-- **codebase-memory** detects indexed Codebase Memory project names in `UserPromptSubmit` prompts and injects MCP verification context.
+- **codebase-memory** provides Codebase Memory MCP profiles, indexed-project prompt routing, agents, and a skill.
 - **wsl-notifications** sends selected Junie lifecycle notifications through Windows Toast from WSL, `notify-send`, or `JUNIE_NOTIFY_COMMAND`.
 - **azure** provides the Azure MCP server configuration.
 - **azure-devops** provides the Azure DevOps MCP server, agents, and workflow skills.
 
-## Use
+## Install
 
-Add this repository as a local marketplace in Junie CLI, then install the extensions you need with `/extensions`. Junie owns installation and its cache; this repository contains no installer or uninstaller.
+From a project where you run Junie CLI, add this repository as a marketplace:
+
+```text
+/extensions marketplace add https://github.com/upfera/junie-extensions
+```
+
+The repository URL uses its default branch, `main`. Install an extension from the `/extensions` screen, or run:
+
+```text
+/extensions install codebase-memory
+```
+
+Replace `codebase-memory` with `wsl-notifications`, `azure`, or `azure-devops` to install a different extension. Junie owns installation and its cache; this repository contains no installer or uninstaller.
 
 Hook commands use paths relative to the installed extension, so they continue to work after Junie copies an extension into its local cache. `${CLAUDE_PLUGIN_ROOT}` is not used; it is a Claude Code plugin variable, not a Junie CLI variable.
 
