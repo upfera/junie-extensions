@@ -10,6 +10,7 @@ ROUTER="${PROJECT_ROOT}/scripts/cbm-project-router.sh"
 
 PASSED=0
 FAILED=0
+readonly ATLAS_PROJECT="atlas-rjthk1"
 
 run_test() {
     local test_num="$1"
@@ -27,7 +28,7 @@ run_test() {
     echo "----------------------------------------------------------------------"
 
     local actual_stdout actual_exit
-    if [ -n "$env_prefix" ]; then
+    if [[ -n "$env_prefix" ]]; then
         actual_stdout=$(eval "${env_prefix}\"${ROUTER}\"" <<< "${input_json}")
         actual_exit=$?
     else
@@ -40,16 +41,16 @@ run_test() {
 
     # Evaluation
     local ok=true
-    if [ "$actual_exit" -ne 0 ]; then
+    if [[ "$actual_exit" -ne 0 ]]; then
         echo "RESULT: FAIL (expected exit code 0, got ${actual_exit})"
         ok=false
-    elif [ "$expected_type" = "empty" ]; then
-        if [ -n "$actual_stdout" ]; then
+    elif [[ "$expected_type" = "empty" ]]; then
+        if [[ -n "$actual_stdout" ]]; then
             echo "RESULT: FAIL (expected empty stdout, got non-empty)"
             ok=false
         fi
-    elif [ "$expected_type" = "match" ]; then
-        if [ -z "$actual_stdout" ]; then
+    elif [[ "$expected_type" = "match" ]]; then
+        if [[ -z "$actual_stdout" ]]; then
             echo "RESULT: FAIL (expected match output, got empty stdout)"
             ok=false
         else
@@ -60,13 +61,13 @@ run_test() {
             else
                 local ctx
                 ctx=$(printf '%s' "$actual_stdout" | jq -r '.additionalContext // empty')
-                if [ -z "$ctx" ]; then
+                if [[ -z "$ctx" ]]; then
                     echo "RESULT: FAIL (JSON missing additionalContext)"
                     ok=false
                 elif [[ "$ctx" != *"$expected_content"* ]]; then
                     echo "RESULT: FAIL (additionalContext does not contain '$expected_content')"
                     ok=false
-                elif [[ "$expected_content" = "atlas-rjthk1" && "$ctx" != *"Do not call list_projects"* ]]; then
+                elif [[ "$expected_content" = "$ATLAS_PROJECT" && "$ctx" != *"Do not call list_projects"* ]]; then
                     echo "RESULT: FAIL (additionalContext does not prohibit redundant list_projects calls)"
                     ok=false
                 fi
@@ -74,13 +75,14 @@ run_test() {
         fi
     fi
 
-    if [ "$ok" = true ]; then
+    if [[ "$ok" = true ]]; then
         echo "RESULT: PASS"
         PASSED=$((PASSED + 1))
     else
         FAILED=$((FAILED + 1))
     fi
     echo ""
+    return 0
 }
 
 echo "=== Starting CBM Project Mention Detector Test Suite ==="
@@ -92,13 +94,13 @@ echo ""
 
 # Test 1: Single match
 run_test "1" "Single match" \
-    '{"prompt": "Please review atlas-rjthk1 code", "cwd": "/home", "session_id": "test-1"}' \
-    "" "match" "atlas-rjthk1"
+    '{"prompt": "Please review '"$ATLAS_PROJECT"' code", "cwd": "/home", "session_id": "test-1"}' \
+    "" "match" "$ATLAS_PROJECT"
 
 # Test 2: Multiple matches
 run_test "2" "Multiple matches" \
-    '{"prompt": "Can you compare atlas-rjthk1 and mercury-wvrbw3?", "cwd": "/home", "session_id": "test-2"}' \
-    "" "match" "atlas-rjthk1, mercury-wvrbw3"
+    '{"prompt": "Can you compare '"$ATLAS_PROJECT"' and mercury-wvrbw3?", "cwd": "/home", "session_id": "test-2"}' \
+    "" "match" "$ATLAS_PROJECT, mercury-wvrbw3"
 
 # Test 3: No match
 run_test "3" "No match (unrelated prompt)" \
@@ -108,22 +110,22 @@ run_test "3" "No match (unrelated prompt)" \
 # Test 4: Case differences and underscore substitution
 run_test "4" "Case differences and _ vs -" \
     '{"prompt": "Check ATLAS_RJTHK1 and Mercury_WVRBW3", "cwd": "/home", "session_id": "test-4"}' \
-    "" "match" "atlas-rjthk1, mercury-wvrbw3"
+    "" "match" "$ATLAS_PROJECT, mercury-wvrbw3"
 
 # Test 5a: False positive check (substring containment)
 run_test "5a" "False positive check (longer identifiers only)" \
-    '{"prompt": "We are evaluating super-atlas-rjthk1-v2 and atlas-rjthk1-mock.", "cwd": "/home", "session_id": "test-5a"}' \
+    '{"prompt": "We are evaluating super-'"$ATLAS_PROJECT"'-v2 and '"$ATLAS_PROJECT"'-mock.", "cwd": "/home", "session_id": "test-5a"}' \
     "" "empty" ""
 
 # Test 5b: False positive check (longer identifier + legitimate separate token)
 run_test "5b" "False positive check (substring coexisting with legitimate token)" \
-    '{"prompt": "Don'\''t use super-atlas-rjthk1-v2, use atlas-rjthk1 instead.", "cwd": "/home", "session_id": "test-5b"}' \
-    "" "match" "atlas-rjthk1"
+    '{"prompt": "Do not use super-'"$ATLAS_PROJECT"'-v2, use '"$ATLAS_PROJECT"' instead.", "cwd": "/home", "session_id": "test-5b"}' \
+    "" "match" "$ATLAS_PROJECT"
 
 # Test 6: Punctuation adjacency
 run_test "6" "Punctuation adjacency" \
-    '{"prompt": "What about atlas-rjthk1? Compare with (mercury-wvrbw3), `atlas-rjthk1`.", "cwd": "/home", "session_id": "test-6"}' \
-    "" "match" "atlas-rjthk1, mercury-wvrbw3"
+    '{"prompt": "What about '"$ATLAS_PROJECT"'? Compare with (mercury-wvrbw3), `'"$ATLAS_PROJECT"'`.", "cwd": "/home", "session_id": "test-6"}' \
+    "" "match" "$ATLAS_PROJECT, mercury-wvrbw3"
 
 # Test 7a: Empty stdin
 run_test "7a" "Empty stdin" \
@@ -144,9 +146,9 @@ run_test "7c" "Missing prompt field" \
 TEST_COLD_DIR="/tmp/test-cbm-cold-cache-$$"
 rm -rf "$TEST_COLD_DIR"
 run_test "8" "Cold cache rebuilding" \
-    '{"prompt": "Check atlas-rjthk1 on cold cache", "cwd": "/home", "session_id": "test-8"}' \
+    '{"prompt": "Check '"$ATLAS_PROJECT"' on cold cache", "cwd": "/home", "session_id": "test-8"}' \
     "JUNIE_CBM_CACHE_DIR=\"$TEST_COLD_DIR\" JUNIE_CBM_CACHE_FILE=\"$TEST_COLD_DIR/projects.json\" " \
-    "match" "atlas-rjthk1"
+    "match" "$ATLAS_PROJECT"
 rm -rf "$TEST_COLD_DIR"
 
 # Test 9: CBM binary temporarily missing with empty cache
@@ -154,7 +156,7 @@ TEST_MISSING_DIR="/tmp/test-cbm-missing-cache-$$"
 rm -rf "$TEST_MISSING_DIR"
 mkdir -p "$TEST_MISSING_DIR"
 run_test "9" "CBM binary temporarily missing (fail-open silent exit 0)" \
-    '{"prompt": "Check atlas-rjthk1 with missing binary", "cwd": "/home", "session_id": "test-9"}' \
+    '{"prompt": "Check '"$ATLAS_PROJECT"' with missing binary", "cwd": "/home", "session_id": "test-9"}' \
     "PATH=\"/usr/bin:/bin\" JUNIE_CBM_CACHE_DIR=\"$TEST_MISSING_DIR\" JUNIE_CBM_CACHE_FILE=\"$TEST_MISSING_DIR/projects.json\" " \
     "empty" ""
 rm -rf "$TEST_MISSING_DIR"
@@ -163,7 +165,7 @@ echo "======================================================================"
 echo "Test Summary: ${PASSED} passed, ${FAILED} failed"
 echo "======================================================================"
 
-if [ "$FAILED" -eq 0 ]; then
+if [[ "$FAILED" -eq 0 ]]; then
     exit 0
 else
     exit 1
